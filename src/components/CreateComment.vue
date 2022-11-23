@@ -5,46 +5,42 @@
       <textarea v-model="text" class="form-control" rows="3" name="text" />
     </div>
     <div class="d-flex align-items-center justify-content-between">
-      <button type="button" class="btn btn-link" @click="$router.back()">回上一頁</button>
-      <button type="submit" class="btn btn-primary mr-0">
-        Submit
+      <button type="button" class="btn btn-link" @click="$router.back()">
+        回上一頁
       </button>
+      <button type="submit" class="btn btn-primary mr-0">Submit</button>
     </div>
   </form>
 </template>
 
-<script>
-import { Toast } from './../utils/helpers'
+<script setup>
+import { ref } from "vue";
+import { Toast } from "./../utils/helpers";
 
-export default {
-  name: 'CreateComment',
-  data() {
-    return {
-      text: '',
-    }
+const props = defineProps({
+  restaurantId: {
+    type: Number,
+    required: true,
   },
-  props: {
-    restaurantId: {
-      type: Number,
-      required: true,
-    },
-  },
-  methods: {
-    handleSubmit() {
-      if (!this.text) {
-        Toast.fire({
-          icon: 'warning',
-          title: '請輸入評論',
-        })
-        return
-      }
-      this.$emit('after-create-comment', {
-        restaurantId: this.restaurantId,
-        text: this.text,
-      })
-      this.text = ''
-    },
-  },
+});
+
+const emit = defineEmits(["after-create-comment"]);
+
+const text = ref("");
+
+function handleSubmit() {
+  if (!text.value) {
+    Toast.fire({
+      icon: "warning",
+      title: "請輸入評論",
+    });
+    return;
+  }
+  emit("after-create-comment", {
+    restaurantId: props.restaurantId,
+    text: text.value,
+  });
+  text.value = "";
 }
 </script>
 

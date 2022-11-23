@@ -40,7 +40,7 @@
       </button>
       <div class="text-center mb-3">
         <p>
-          <router-link to="/signup"> Sign Up </router-link>
+          <RouterLink to="/signup"> Sign Up </RouterLink>
         </p>
       </div>
       <p class="mt-5 mb-3 text-muted text-center">&copy; 2017-2018</p>
@@ -49,14 +49,13 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
 import authorizationAPI from "./../apis/authorization";
+import { ref } from "vue";
 import { Toast } from "./../utils/helpers";
-import { useRouter } from "vue-router";
+import { useRouter, RouterLink } from "vue-router";
 import { useStore } from "vuex";
 const router = useRouter();
 const store = useStore();
-
 const email = ref("");
 const password = ref("");
 const isProcessing = ref(false);

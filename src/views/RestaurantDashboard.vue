@@ -8,14 +8,11 @@
           {{ restaurant.categoryName }}
         </span>
       </div>
-
       <hr />
-
       <ul>
         <li>評論數： {{ restaurant.commentsLength }}</li>
         <li>瀏覽次數： {{ restaurant.viewCounts }}</li>
       </ul>
-
       <button type="button" class="btn btn-link" @click="$router.back()">
         回上一頁
       </button>
@@ -23,54 +20,44 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import restaurantsAPI from "./../apis/restaurants";
-import { Toast } from "./../utils/helpers";
 import Spinner from "./../components/Spinner.vue";
+import { ref } from "vue";
+import { Toast } from "./../utils/helpers";
+import { useRoute } from "vue-router";
 
-export default {
-  name: "RestaurantDashboard",
-  components: {
-    Spinner,
-  },
-  data() {
-    return {
-      restaurant: {
-        id: -1,
-        name: "",
-        categoryName: "",
-        commentsLength: 0,
-        viewCounts: 0,
-      },
-      isLoading: true,
+const restaurant = ref({
+  id: -1,
+  name: "",
+  categoryName: "",
+  commentsLength: 0,
+  viewCounts: 0,
+});
+const isLoading = ref(true);
+
+const route = useRoute();
+const { id: restaurantId } = route.params;
+fetchRestaurant(restaurantId);
+
+async function fetchRestaurant(restaurantId) {
+  try {
+    isLoading.value = true;
+    const { data } = await restaurantsAPI.getRestaurant({ restaurantId });
+    restaurant.value = {
+      id: data.restaurant.id,
+      name: data.restaurant.name,
+      categoryName: data.restaurant.Category.name,
+      commentsLength: data.restaurant.Comments.length,
+      viewCounts: data.restaurant.viewCounts,
     };
-  },
-  setup() {
-    const { id: restaurantId } = this.$route.params;
-    this.fetchRestaurant(restaurantId);
-  },
-  methods: {
-    async fetchRestaurant(restaurantId) {
-      try {
-        this.isLoading = true;
-        const { data } = await restaurantsAPI.getRestaurant({ restaurantId });
-
-        this.restaurant = {
-          id: data.restaurant.id,
-          name: data.restaurant.name,
-          categoryName: data.restaurant.Category.name,
-          commentsLength: data.restaurant.Comments.length,
-          viewCounts: data.restaurant.viewCounts,
-        };
-        this.isLoading = false;
-      } catch (error) {
-        this.isLoading = false;
-        Toast.fire({
-          icon: "error",
-          title: "無法取得餐廳資料，請稍後再試",
-        });
-      }
-    },
-  },
-};
+    isLoading.value = false;
+  } catch (error) {
+    isLoading.value = false;
+    Toast.fire({
+      icon: "error",
+      title: "無法取得餐廳資料，請稍後再試",
+    });
+  }
+}
 </script>

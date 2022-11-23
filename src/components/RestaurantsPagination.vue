@@ -1,9 +1,11 @@
 <template>
   <nav aria-label="Page navigation example">
     <ul class="pagination">
-      <!-- 前一頁 previousPage -->
-      <li v-show="previousPage" :class="['page-item', { disabled: currentPage === 1 }]">
-        <router-link
+      <li
+        v-show="previousPage"
+        :class="['page-item', { disabled: currentPage === 1 }]"
+      >
+        <RouterLink
           class="page-link"
           aria-label="Previous"
           :to="{
@@ -12,52 +14,60 @@
           }"
         >
           <span aria-hidden="true">&laquo;</span>
-        </router-link>
+        </RouterLink>
       </li>
-
-      <!-- 頁碼 -->
-      <li v-for="page in totalPage" :key="page" :class="['page-item', { active: currentPage === page }]">
-        <router-link class="page-link" :to="{ name: 'restaurants', query: { categoryId, page } }">
+      <li
+        v-for="page in totalPage"
+        :key="page"
+        :class="['page-item', { active: currentPage === page }]"
+      >
+        <RouterLink
+          class="page-link"
+          :to="{ name: 'restaurants', query: { categoryId, page } }"
+        >
           {{ page }}
-        </router-link>
+        </RouterLink>
       </li>
-
-      <!-- 後一頁 nextPage -->
-      <li v-show="nextPage" :class="['page-item', { disabled: currentPage === totalPage.length }]">
-        <router-link class="page-link" :to="{ name: 'restaurants', query: { categoryId, page: nextPage } }" aria-label="Next">
+      <li
+        v-show="nextPage"
+        :class="['page-item', { disabled: currentPage === totalPage.length }]"
+      >
+        <RouterLink
+          class="page-link"
+          :to="{ name: 'restaurants', query: { categoryId, page: nextPage } }"
+          aria-label="Next"
+        >
           <span aria-hidden="true">&raquo;</span>
-        </router-link>
+        </RouterLink>
       </li>
     </ul>
   </nav>
 </template>
 
-<script>
-export default {
-  name: 'RestaurantsPagination',
-  props: {
-    categoryId: {
-      type: [String, Number],
-      default: '',
-    },
-    currentPage: {
-      type: Number,
-      default: 1,
-    },
-    totalPage: {
-      type: Array,
-      required: true,
-    },
-    previousPage: {
-      type: Number,
-      required: true,
-    },
-    nextPage: {
-      type: Number,
-      required: true,
-    },
+<script setup>
+import { RouterLink } from "vue-router";
+defineProps({
+  categoryId: {
+    type: [String, Number],
+    default: "",
   },
-}
+  currentPage: {
+    type: Number,
+    default: 1,
+  },
+  totalPage: {
+    type: Array,
+    required: true,
+  },
+  previousPage: {
+    type: Number,
+    required: true,
+  },
+  nextPage: {
+    type: Number,
+    required: true,
+  },
+});
 </script>
 
 <style scoped>

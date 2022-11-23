@@ -1,29 +1,29 @@
 <template>
   <ul class="nav nav-pills mb-4">
     <li class="nav-item">
-      <router-link class="nav-link" :to="{ name: 'restaurants' }">
+      <RouterLink class="nav-link" :to="{ name: 'restaurants' }">
         全部
-      </router-link>
+      </RouterLink>
     </li>
-
     <li v-for="category in categories" :key="category.id" class="nav-item">
-      <router-link class="nav-link" :to="{ name: 'restaurants', query: { categoryId: category.id } }">
+      <RouterLink
+        class="nav-link"
+        :to="{ name: 'restaurants', query: { categoryId: category.id } }"
+      >
         {{ category.name }}
-      </router-link>
+      </RouterLink>
     </li>
   </ul>
 </template>
 
-<script>
-export default {
-  name: 'RestaurantsNavPills',
-  props: {
-    categories: {
-      type: Array,
-      required: true,
-    },
+<script setup>
+import { RouterLink } from "vue-router";
+defineProps({
+  categories: {
+    type: Array,
+    required: true,
   },
-}
+});
 </script>
 
 <style scoped>
@@ -42,7 +42,7 @@ export default {
   transition: none;
 }
 
-.nav-pills .nav-link.active,
+.nav-pills .nav-link.active-link,
 .nav-pills .show > .nav-link {
   border-width: 2px;
   border-color: #bd2333;

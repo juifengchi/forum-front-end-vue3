@@ -1,12 +1,14 @@
 <template>
   <div>
-    <h2 class="my-4">
-      所有評論：
-    </h2>
-
+    <h2 class="my-4">所有評論：</h2>
     <div v-for="comment in restaurantComments" :key="comment.id">
       <blockquote class="blockquote mb-0">
-        <button v-if="currentUser.isAdmin" type="button" class="btn btn-danger float-right" @click.stop.prevent="handleDeleteButtonClick(comment.id)">
+        <button
+          v-if="currentUser.isAdmin"
+          type="button"
+          class="btn btn-danger float-right"
+          @click.stop.prevent="handleDeleteButtonClick(comment.id)"
+        >
           Delete
         </button>
         <h3>
@@ -25,25 +27,24 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
+<script setup>
+import { useStore } from "vuex";
+import { computed } from "vue";
 
-export default {
-  name: 'RestaurantComments',
-  props: {
-    restaurantComments: {
-      type: Array,
-      required: true,
-    },
+defineProps({
+  restaurantComments: {
+    type: Array,
+    required: true,
   },
-  computed: {
-    ...mapState(['currentUser']),
-  },
-  methods: {
-    handleDeleteButtonClick(commentId) {
-      this.$emit('after-delete-comment', commentId)
-    },
-  },
+});
+
+const emit = defineEmits(["after-delete-comment"]);
+
+const store = useStore();
+const currentUser = computed(() => store.state.currentUser);
+
+function handleDeleteButtonClick(commentId) {
+  emit("after-delete-comment", commentId);
 }
 </script>
 

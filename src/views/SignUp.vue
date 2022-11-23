@@ -4,7 +4,6 @@
       <div class="text-center mb-4">
         <h1 class="h3 mb-3 font-weight-normal">Sign Up</h1>
       </div>
-
       <div class="form-label-group mb-2">
         <label for="name">Name</label>
         <input
@@ -19,7 +18,6 @@
           autofocus
         />
       </div>
-
       <div class="form-label-group mb-2">
         <label for="email">Email</label>
         <input
@@ -33,7 +31,6 @@
           required
         />
       </div>
-
       <div class="form-label-group mb-3">
         <label for="password">Password</label>
         <input
@@ -47,7 +44,6 @@
           required
         />
       </div>
-
       <div class="form-label-group mb-3">
         <label for="password-check">Password Check</label>
         <input
@@ -61,7 +57,6 @@
           required
         />
       </div>
-
       <button
         class="btn btn-lg btn-primary btn-block mb-3"
         type="submit"
@@ -72,10 +67,9 @@
 
       <div class="text-center mb-3">
         <p>
-          <router-link to="/signin"> Sign In </router-link>
+          <RouterLink to="/signin"> Sign In </RouterLink>
         </p>
       </div>
-
       <p class="mt-5 mb-3 text-muted text-center">&copy; 2017-2018</p>
     </form>
   </div>
@@ -85,7 +79,7 @@
 import authorizationAPI from "./../apis/authorization";
 import { ref } from "vue";
 import { Toast } from "./../utils/helpers";
-import { useRouter } from "vue-router";
+import { useRouter, RouterLink } from "vue-router";
 const router = useRouter();
 const name = ref("");
 const email = ref("");
