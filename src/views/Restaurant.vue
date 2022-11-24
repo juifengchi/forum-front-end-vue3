@@ -60,21 +60,30 @@ async function fetchRestaurant(restaurantId) {
   try {
     isLoading.value = true;
     const { data } = await restaurantsAPI.getRestaurant({ restaurantId });
+    const {
+      id,
+      name,
+      image,
+      tel,
+      address,
+      description,
+      Category,
+      opening_hours,
+      Comments,
+    } = data.restaurant;
     restaurant.value = {
-      id: data.restaurant.id,
-      name: data.restaurant.name,
-      categoryName: data.restaurant.Category
-        ? data.restaurant.Category.name
-        : "未分類",
-      image: data.restaurant.image,
-      openingHours: data.restaurant.opening_hours,
-      tel: data.restaurant.tel,
-      address: data.restaurant.address,
-      description: data.restaurant.description,
+      id,
+      name,
+      categoryName: Category ? Category.name : "未分類",
+      image,
+      openingHours: opening_hours,
+      tel,
+      address,
+      description,
       isFavorited: data.isFavorited,
       isLiked: data.isLiked,
     };
-    restaurantComments.value = data.restaurant.Comments;
+    restaurantComments.value = Comments;
     isLoading.value = false;
   } catch (error) {
     isLoading.value = false;
