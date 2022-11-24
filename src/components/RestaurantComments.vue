@@ -12,9 +12,9 @@
           Delete
         </button>
         <h3>
-          <router-link :to="{ name: 'user', params: { id: comment.User.id } }">
+          <RouterLink :to="{ name: 'user', params: { id: comment.User.id } }">
             {{ comment.User.name }}
-          </router-link>
+          </RouterLink>
         </h3>
         <p>{{ comment.text }}</p>
         <footer class="blockquote-footer">
@@ -30,6 +30,7 @@
 <script setup>
 import { useStore } from "vuex";
 import { computed } from "vue";
+import { RouterLink } from "vue-router";
 
 defineProps({
   restaurantComments: {

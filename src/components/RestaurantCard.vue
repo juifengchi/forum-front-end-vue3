@@ -69,6 +69,7 @@
 
 <script setup>
 import usersAPI from "./../apis/users";
+import { RouterLink } from "vue-router";
 import { ref } from "vue";
 import { Toast } from "./../utils/helpers";
 

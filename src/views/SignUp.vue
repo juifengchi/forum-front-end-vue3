@@ -64,7 +64,6 @@
       >
         {{ isProcessing ? "Processing..." : "Submit" }}
       </button>
-
       <div class="text-center mb-3">
         <p>
           <RouterLink to="/signin"> Sign In </RouterLink>

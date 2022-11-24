@@ -60,19 +60,6 @@ async function fetchRestaurant(restaurantId) {
   try {
     isLoading.value = true;
     const { data } = await restaurantsAPI.getRestaurant({ restaurantId });
-    // Re-declare Variable
-    // const { restaurant, isFavorited, isLiked } = data;
-    // const {
-    //   id,
-    //   name,
-    //   Category,
-    //   image,
-    //   opening_hours: openingHours,
-    //   tel,
-    //   address,
-    //   description,
-    //   Comments,
-    // } = restaurant;
     restaurant.value = {
       id: data.restaurant.id,
       name: data.restaurant.name,

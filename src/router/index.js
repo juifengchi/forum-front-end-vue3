@@ -2,15 +2,15 @@ import { createRouter, createWebHistory } from "vue-router";
 import NotFound from "../views/NotFound.vue";
 import SignIn from "../views/SignIn.vue";
 import Restaurants from "../views/Restaurants.vue";
-import store from "./../store";
+import { storeToRefs } from "pinia";
+import { useUserStore } from "../store/userStore.js";
 
-const authorizeIsAdmin = (to, from, next) => {
-  const currentUser = store.state.currentUser;
-  if (currentUser && !currentUser.isAdmin) {
-    next("/404");
-    return;
+const authorizeIsAdmin = (to, from) => {
+  const { currentUser } = storeToRefs(useUserStore());
+  const currentUserInStore = currentUser.value;
+  if (currentUserInStore && !currentUserInStore.isAdmin) {
+    return { name: "not-found" };
   }
-  next();
 };
 
 const router = createRouter({
@@ -122,31 +122,29 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, from) => {
+  const { fetchCurrentUser } = useUserStore();
+  const { isAuthenticated, token } = storeToRefs(useUserStore());
   const tokenInLocalStorage = localStorage.getItem("token");
-  const tokenInStore = store.state.token;
-  let isAuthenticated = store.state.isAuthenticated;
-
+  const tokenInStore = token.value;
+  let isAuthenticatedInStore = isAuthenticated.value;
   // 比較 localStorage 和 store 中的 token 是否一樣
   if (tokenInLocalStorage && tokenInLocalStorage !== tokenInStore) {
-    isAuthenticated = await store.dispatch("fetchCurrentUser");
+    isAuthenticatedInStore = await fetchCurrentUser();
   }
-
   // 對於不需要驗證 token 的頁面
   const pathsWithoutAuthentication = ["sign-up", "sign-in"];
-
   // 如果 token 無效且進入需要驗證的頁面則轉址到登入頁
-  if (!isAuthenticated && !pathsWithoutAuthentication.includes(to.name)) {
-    next("/signin");
-    return;
+  if (
+    !isAuthenticatedInStore &&
+    !pathsWithoutAuthentication.includes(to.name)
+  ) {
+    return { name: "sign-in" };
   }
-
   // 如果 token 有效且進入不需要驗證到頁面則轉址到餐廳首頁
-  if (isAuthenticated && pathsWithoutAuthentication.includes(to.name)) {
-    next("/restaurants");
-    return;
+  if (isAuthenticatedInStore && pathsWithoutAuthentication.includes(to.name)) {
+    return { name: "restaurants" };
   }
-  next();
 });
 
 export default router;

@@ -34,9 +34,7 @@ export default Vuex.createStore({
     async fetchCurrentUser({ commit }) {
       try {
         const { data } = await usersAPI.getCurrentUser();
-
         const { id, name, email, image, isAdmin } = data;
-
         commit("setCurrentUser", {
           id,
           name,
