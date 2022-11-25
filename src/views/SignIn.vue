@@ -63,7 +63,7 @@ export default {
     const password = ref("");
     const isProcessing = ref(false);
 
-    async function handleSubmit(e) {
+    async function handleSubmit() {
       try {
         if (!email.value || !password.value) {
           Toast.fire({
@@ -74,11 +74,10 @@ export default {
         }
         isProcessing.value = true;
         // 使用 authorizationAPI 的 signIn 方法並且帶入使用者填寫的 email 和 password
-        const response = await authorizationAPI.signIn({
+        const { data } = await authorizationAPI.signIn({
           email: email.value,
           password: password.value,
         });
-        const { data } = response;
         if (data.status !== "success") {
           throw new Error(data.message);
         }

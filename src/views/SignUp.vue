@@ -8,7 +8,7 @@
         <label for="name">Name</label>
         <input
           id="name"
-          v-model="name"
+          v-model="signUpInfo.name"
           name="name"
           type="text"
           class="form-control"
@@ -22,7 +22,7 @@
         <label for="email">Email</label>
         <input
           id="email"
-          v-model="email"
+          v-model="signUpInfo.email"
           name="email"
           type="email"
           class="form-control"
@@ -35,7 +35,7 @@
         <label for="password">Password</label>
         <input
           id="password"
-          v-model="password"
+          v-model="signUpInfo.password"
           name="password"
           type="password"
           class="form-control"
@@ -48,7 +48,7 @@
         <label for="password-check">Password Check</label>
         <input
           id="password-check"
-          v-model="passwordCheck"
+          v-model="signUpInfo.passwordCheck"
           name="passwordCheck"
           type="password"
           class="form-control"
@@ -76,43 +76,46 @@
 
 <script setup>
 import authorizationAPI from "./../apis/authorization";
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 import { Toast } from "./../utils/helpers";
 import { useRouter, RouterLink } from "vue-router";
+
 const router = useRouter();
-const name = ref("");
-const email = ref("");
-const password = ref("");
-const passwordCheck = ref("");
+const signUpInfo = reactive({
+  name: "",
+  email: "",
+  password: "",
+  passwordCheck: "",
+});
 const isProcessing = ref(false);
 
-async function handleSubmit(e) {
+async function handleSubmit() {
   try {
-    if (!name.value) {
+    if (!signUpInfo.name) {
       Toast.fire({
         icon: "warning",
         title: "請輸入名稱",
       });
       return;
-    } else if (!email.value) {
+    } else if (!signUpInfo.email) {
       Toast.fire({
         icon: "warning",
         title: "請輸入信箱",
       });
       return;
-    } else if (!password.value) {
+    } else if (!signUpInfo.password) {
       Toast.fire({
         icon: "warning",
         title: "請輸入密碼",
       });
       return;
-    } else if (!passwordCheck.value) {
+    } else if (!signUpInfo.passwordCheck) {
       Toast.fire({
         icon: "warning",
         title: "請輸入密碼確認",
       });
       return;
-    } else if (password.value !== passwordCheck.value) {
+    } else if (signUpInfo.password !== signUpInfo.passwordCheck) {
       Toast.fire({
         icon: "warning",
         title: "密碼前後不一致",
@@ -121,17 +124,10 @@ async function handleSubmit(e) {
     }
     isProcessing.value = true;
 
-    const formData = {
-      name: name.value,
-      email: email.value,
-      password: password.value,
-      passwordCheck: passwordCheck.value,
-    };
-    const { data } = await authorizationAPI.signUp(formData);
+    const { data } = await authorizationAPI.signUp(signUpInfo);
     if (data.status !== "success") {
       throw new Error(data.message);
     }
-
     router.push({ name: "sign-in", params: { register: "success" } });
   } catch (error) {
     isProcessing.value = false;
