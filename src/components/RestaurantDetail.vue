@@ -32,18 +32,19 @@
     </div>
     <div class="col-lg-8">
       <p>{{ restaurant.description }}</p>
-      <router-link
+      <RouterLink
         :to="{ name: 'restaurant-dashboard', params: { id: restaurant.id } }"
         class="btn btn-primary btn-border mr-2"
       >
         Dashboard
-      </router-link>
+      </RouterLink>
 
       <button
         v-if="restaurant.isFavorited"
         type="button"
         class="btn btn-danger btn-border mr-2"
-        @click.stop.prevent="deleteFavorite(restaurant.id)"
+        :disabled="isProcessing"
+        @click.stop.prevent="toggleFavorite(restaurant.id)"
       >
         移除最愛
       </button>
@@ -51,7 +52,8 @@
         v-else
         type="button"
         class="btn btn-primary btn-border mr-2"
-        @click.stop.prevent="addFavorite(restaurant.id)"
+        :disabled="isProcessing"
+        @click.stop.prevent="toggleFavorite(restaurant.id)"
       >
         加到最愛
       </button>
@@ -59,7 +61,8 @@
         v-if="restaurant.isLiked"
         type="button"
         class="btn btn-danger like mr-2"
-        @click.stop.prevent="deleteLike(restaurant.id)"
+        :disabled="isProcessing"
+        @click.stop.prevent="toggleLike(restaurant.id)"
       >
         Unlike
       </button>
@@ -67,7 +70,8 @@
         v-else
         type="button"
         class="btn btn-primary like mr-2"
-        @click.stop.prevent="addLike(restaurant.id)"
+        :disabled="isProcessing"
+        @click.stop.prevent="toggleLike(restaurant.id)"
       >
         Like
       </button>
@@ -79,6 +83,7 @@
 import usersAPI from "./../apis/users";
 import { ref, watch } from "vue";
 import { Toast } from "./../utils/helpers";
+import { RouterLink } from "vue-router";
 
 const props = defineProps({
   initialRestaurant: {
@@ -88,6 +93,7 @@ const props = defineProps({
 });
 
 const restaurant = ref(props.initialRestaurant);
+const isProcessing = ref(false);
 
 watch(props.initialRestaurant, (newValue) => {
   restaurant.value = {
@@ -96,75 +102,57 @@ watch(props.initialRestaurant, (newValue) => {
   };
 });
 
-async function addFavorite(restaurantId) {
+async function toggleFavorite(restaurantId) {
   try {
-    const { data } = await usersAPI.addFavorite({ restaurantId });
+    isProcessing.value = true;
+    const { data } = !restaurant.value.isFavorited
+      ? await usersAPI.addFavorite({ restaurantId })
+      : await usersAPI.deleteFavorite({ restaurantId });
     if (data.status !== "success") {
       throw new Error(data.message);
     }
     restaurant.value = {
       ...restaurant.value,
-      isFavorited: true,
+      isFavorited: !restaurant.value.isFavorited,
     };
+    isProcessing.value = false;
   } catch (error) {
+    isProcessing.value = false;
+    const toastTitle = !restaurant.value.isFavorited
+      ? "無法將餐廳加入最愛，請稍後再試"
+      : "無法將餐廳移除最愛，請稍後再試";
     Toast.fire({
       icon: "error",
-      title: "無法將餐廳加入最愛，請稍後再試",
+      title: toastTitle,
     });
+    console.log("error", error);
   }
 }
 
-async function deleteFavorite(restaurantId) {
+async function toggleLike(restaurantId) {
   try {
-    const { data } = await usersAPI.deleteFavorite({ restaurantId });
+    isProcessing.value = true;
+    const { data } = !restaurant.value.isLiked
+      ? await usersAPI.addLike({ restaurantId })
+      : await usersAPI.deleteLike({ restaurantId });
     if (data.status !== "success") {
       throw new Error(data.message);
     }
     restaurant.value = {
       ...restaurant.value,
-      isFavorited: false,
+      isLiked: !restaurant.value.isLiked,
     };
+    isProcessing.value = false;
   } catch (error) {
+    isProcessing.value = false;
+    const toastTitle = !restaurant.value.isLiked
+      ? "無法對餐廳按讚，請稍後再試"
+      : "無法對餐廳取消讚，請稍後再試";
     Toast.fire({
       icon: "error",
-      title: "無法將餐廳移除最愛，請稍後再試",
+      title: toastTitle,
     });
-  }
-}
-
-async function addLike(restaurantId) {
-  try {
-    const { data } = await usersAPI.addLike({ restaurantId });
-    if (data.status !== "success") {
-      throw new Error(data.message);
-    }
-    restaurant.value = {
-      ...restaurant.value,
-      isLiked: true,
-    };
-  } catch (error) {
-    Toast.fire({
-      icon: "error",
-      title: "無法對餐廳按讚，請稍後再試",
-    });
-  }
-}
-
-async function deleteLike(restaurantId) {
-  try {
-    const { data } = await usersAPI.deleteLike({ restaurantId });
-    if (data.status !== "success") {
-      throw new Error(data.message);
-    }
-    restaurant.value = {
-      ...restaurant.value,
-      isLiked: false,
-    };
-  } catch (error) {
-    Toast.fire({
-      icon: "error",
-      title: "無法對餐廳取消讚，請稍後再試",
-    });
+    console.log("error", error);
   }
 }
 </script>

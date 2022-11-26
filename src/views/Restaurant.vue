@@ -5,12 +5,12 @@
       <RestaurantDetail :initial-restaurant="restaurant" />
       <hr />
       <RestaurantComments
-        :restaurant-comments="restaurantComments"
-        @after-delete-comment="afterDeleteComment"
+        :restaurant-comments="restaurant.comments"
+        @after-delete-comment="afterHandleComment"
       />
       <CreateComment
         :restaurant-id="restaurant.id"
-        @after-create-comment="afterCreateComment"
+        @after-create-comment="afterHandleComment"
       />
     </template>
   </div>
@@ -23,10 +23,10 @@ import CreateComment from "./../components/CreateComment.vue";
 import restaurantsAPI from "./../apis/restaurants";
 import commentsAPI from "./../apis/comments";
 import Spinner from "./../components/Spinner.vue";
-import { useStore } from "vuex";
 import { Toast } from "./../utils/helpers";
 import { ref, computed } from "vue";
 import { useRoute, onBeforeRouteUpdate } from "vue-router";
+import { useUserStore } from "../store/userStore.js";
 
 const restaurant = ref({
   id: -1,
@@ -39,20 +39,18 @@ const restaurant = ref({
   description: "",
   isFavorited: false,
   isLiked: false,
+  comments: [],
 });
-const restaurantComments = ref([]);
 const isLoading = ref(true);
 
-const store = useStore();
-const currentUser = computed(() => store.state.currentUser);
+const userStore = useUserStore();
+const currentUser = computed(() => userStore.currentUser);
 
 const route = useRoute();
-const { id: restaurantId } = route.params;
-fetchRestaurant(restaurantId);
+fetchRestaurant(route.params.id);
 
 onBeforeRouteUpdate((to, from, next) => {
-  const { id: restaurantId } = to.params;
-  fetchRestaurant(restaurantId);
+  fetchRestaurant(to.params.id);
   next();
 });
 
@@ -82,8 +80,8 @@ async function fetchRestaurant(restaurantId) {
       description,
       isFavorited: data.isFavorited,
       isLiked: data.isLiked,
+      comments: Comments,
     };
-    restaurantComments.value = Comments;
     isLoading.value = false;
   } catch (error) {
     isLoading.value = false;
@@ -94,43 +92,39 @@ async function fetchRestaurant(restaurantId) {
   }
 }
 
-async function afterDeleteComment(commentId) {
+async function afterHandleComment(payload) {
   try {
-    const { data } = await commentsAPI.deleteComment({ commentId });
+    const { data } =
+      payload.action === "delete"
+        ? await commentsAPI.deleteComment({ commentId: payload.commentId })
+        : await commentsAPI.createComment(payload);
     if (data.status !== "success") {
       throw new Error(data.message);
     }
-    restaurantComments.value = restaurantComments.value.filter(
-      (comment) => comment.id !== commentId
-    );
-  } catch (error) {
-    Toast.fire({
-      icon: "error",
-      title: "無法移除評論，請稍後再試",
-    });
-  }
-}
-
-async function afterCreateComment(payload) {
-  try {
-    const { data } = await commentsAPI.createComment(payload);
-    if (data.status !== "success") {
-      throw new Error(data.message);
+    if (payload.action === "delete") {
+      restaurant.value.comments = restaurant.value.comments.value.filter(
+        (comment) => comment.id !== payload.commentId
+      );
+    } else {
+      restaurant.value.comments.push({
+        id: data.commentId,
+        RestaurantId: data.restaurantId,
+        User: {
+          id: currentUser.value.id,
+          name: currentUser.value.name,
+        },
+        text: payload.text,
+        createdAt: new Date(),
+      });
     }
-    restaurantComments.value.push({
-      id: data.commentId,
-      RestaurantId: data.restaurantId,
-      User: {
-        id: currentUser.value.id,
-        name: currentUser.value.name,
-      },
-      text: payload.text,
-      createdAt: new Date(),
-    });
   } catch (error) {
+    const toastTitle =
+      payload.action === "delete"
+        ? "無法移除評論，請稍後再試"
+        : "無法新增評論，請稍後再試";
     Toast.fire({
       icon: "error",
-      title: "無法新增評論，請稍後再試",
+      title: toastTitle,
     });
   }
 }

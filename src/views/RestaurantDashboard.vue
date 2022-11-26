@@ -13,7 +13,7 @@
         <li>評論數： {{ restaurant.commentsLength }}</li>
         <li>瀏覽次數： {{ restaurant.viewCounts }}</li>
       </ul>
-      <button type="button" class="btn btn-link" @click="$router.back()">
+      <button type="button" class="btn btn-link" @click="router.back()">
         回上一頁
       </button>
     </template>
@@ -25,7 +25,7 @@ import restaurantsAPI from "./../apis/restaurants";
 import Spinner from "./../components/Spinner.vue";
 import { ref } from "vue";
 import { Toast } from "./../utils/helpers";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const restaurant = ref({
   id: -1,
@@ -37,19 +37,20 @@ const restaurant = ref({
 const isLoading = ref(true);
 
 const route = useRoute();
-const { id: restaurantId } = route.params;
-fetchRestaurant(restaurantId);
+const router = useRouter();
+fetchRestaurant(route.params.id);
 
 async function fetchRestaurant(restaurantId) {
   try {
     isLoading.value = true;
     const { data } = await restaurantsAPI.getRestaurant({ restaurantId });
+    const { id, name, Category, Comments, viewCounts } = data.restaurant;
     restaurant.value = {
-      id: data.restaurant.id,
-      name: data.restaurant.name,
-      categoryName: data.restaurant.Category.name,
-      commentsLength: data.restaurant.Comments.length,
-      viewCounts: data.restaurant.viewCounts,
+      id,
+      name,
+      categoryName: Category.name,
+      commentsLength: Comments.length,
+      viewCounts,
     };
     isLoading.value = false;
   } catch (error) {

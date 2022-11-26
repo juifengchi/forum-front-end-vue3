@@ -5,7 +5,7 @@
       <textarea v-model="text" class="form-control" rows="3" name="text" />
     </div>
     <div class="d-flex align-items-center justify-content-between">
-      <button type="button" class="btn btn-link" @click="$router.back()">
+      <button type="button" class="btn btn-link" @click="router.back()">
         回上一頁
       </button>
       <button type="submit" class="btn btn-primary mr-0">Submit</button>
@@ -16,14 +16,15 @@
 <script setup>
 import { ref } from "vue";
 import { Toast } from "./../utils/helpers";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const props = defineProps({
   restaurantId: {
     type: Number,
     required: true,
   },
 });
-
 const emit = defineEmits(["after-create-comment"]);
 
 const text = ref("");
@@ -39,6 +40,7 @@ function handleSubmit() {
   emit("after-create-comment", {
     restaurantId: props.restaurantId,
     text: text.value,
+    emit: "create",
   });
   text.value = "";
 }

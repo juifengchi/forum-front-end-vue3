@@ -28,9 +28,9 @@
 </template>
 
 <script setup>
-import { useStore } from "vuex";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
+import { useUserStore } from "../store/userStore.js";
 
 defineProps({
   restaurantComments: {
@@ -41,11 +41,14 @@ defineProps({
 
 const emit = defineEmits(["after-delete-comment"]);
 
-const store = useStore();
-const currentUser = computed(() => store.state.currentUser);
+const userStore = useUserStore();
+const currentUser = computed(() => userStore.currentUser);
 
 function handleDeleteButtonClick(commentId) {
-  emit("after-delete-comment", commentId);
+  emit("after-delete-comment", {
+    commentId,
+    action: "delete",
+  });
 }
 </script>
 
