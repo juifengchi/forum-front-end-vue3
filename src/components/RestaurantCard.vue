@@ -31,7 +31,7 @@
           type="button"
           class="btn btn-danger btn-border favorite mr-2"
           :disabled="isProcessing"
-          @click.stop.prevent="deleteFavorite(restaurant.id)"
+          @click.stop.prevent="toggleFavorite(restaurant.id)"
         >
           移除最愛
         </button>
@@ -40,7 +40,7 @@
           type="button"
           class="btn btn-primary btn-border favorite mr-2"
           :disabled="isProcessing"
-          @click.stop.prevent="addFavorite(restaurant.id)"
+          @click.stop.prevent="toggleFavorite(restaurant.id)"
         >
           加到最愛
         </button>
@@ -49,7 +49,7 @@
           type="button"
           class="btn btn-danger like mr-2"
           :disabled="isProcessing"
-          @click.stop.prevent="deleteLike(restaurant.id)"
+          @click.stop.prevent="toggleLike(restaurant.id)"
         >
           Unlike
         </button>
@@ -58,7 +58,7 @@
           type="button"
           class="btn btn-primary like mr-2"
           :disabled="isProcessing"
-          @click.stop.prevent="addLike(restaurant.id)"
+          @click.stop.prevent="toggleLike(restaurant.id)"
         >
           Like
         </button>
@@ -84,93 +84,59 @@ const restaurant = ref(props.initialRestaurant);
 const isProcessing = ref(false);
 const isLoading = ref(true);
 
-function changeLoading(e) {
+function changeLoading() {
   isLoading.value = false;
 }
 
-async function addFavorite(restaurantId) {
+async function toggleFavorite(restaurantId) {
   try {
     isProcessing.value = true;
-    const { data } = await usersAPI.addFavorite({ restaurantId });
+    const { data } = !restaurant.value.isFavorited
+      ? await usersAPI.addFavorite({ restaurantId })
+      : await usersAPI.deleteFavorite({ restaurantId });
     if (data.status !== "success") {
       throw new Error(data.message);
     }
     restaurant.value = {
       ...restaurant.value,
-      isFavorited: true,
+      isFavorited: !restaurant.value.isFavorited,
     };
     isProcessing.value = false;
   } catch (error) {
     isProcessing.value = false;
+    const toastTitle = !restaurant.value.isFavorited
+      ? "無法將餐廳加入最愛，請稍後再試"
+      : "無法將餐廳移除最愛，請稍後再試";
     Toast.fire({
       icon: "error",
-      title: "無法將餐廳加入最愛，請稍後再試",
+      title: toastTitle,
     });
     console.log("error", error);
   }
 }
 
-async function deleteFavorite(restaurantId) {
+async function toggleLike(restaurantId) {
   try {
     isProcessing.value = true;
-    const { data } = await usersAPI.deleteFavorite({ restaurantId });
+    const { data } = !restaurant.value.isLiked
+      ? await usersAPI.addLike({ restaurantId })
+      : await usersAPI.deleteLike({ restaurantId });
     if (data.status !== "success") {
       throw new Error(data.message);
     }
     restaurant.value = {
       ...restaurant.value,
-      isFavorited: false,
+      isLiked: !restaurant.value.isLiked,
     };
     isProcessing.value = false;
   } catch (error) {
     isProcessing.value = false;
+    const toastTitle = !restaurant.value.isLiked
+      ? "無法對餐廳按讚，請稍後再試"
+      : "無法對餐廳取消讚，請稍後再試";
     Toast.fire({
       icon: "error",
-      title: "無法將餐廳移除最愛，請稍後再試",
-    });
-    console.log("error", error);
-  }
-}
-
-async function addLike(restaurantId) {
-  try {
-    isProcessing.value = true;
-    const { data } = await usersAPI.addLike({ restaurantId });
-    if (data.status !== "success") {
-      throw new Error(data.message);
-    }
-    restaurant.value = {
-      ...restaurant.value,
-      isLiked: true,
-    };
-    isProcessing.value = false;
-  } catch (error) {
-    isProcessing.value = false;
-    Toast.fire({
-      icon: "error",
-      title: "無法對餐廳按讚，請稍後再試",
-    });
-    console.log("error", error);
-  }
-}
-
-async function deleteLike(restaurantId) {
-  try {
-    isProcessing.value = true;
-    const { data } = await usersAPI.deleteLike({ restaurantId });
-    if (data.status !== "success") {
-      throw new Error(data.message);
-    }
-    restaurant.value = {
-      ...restaurant.value,
-      isLiked: false,
-    };
-    isProcessing.value = false;
-  } catch (error) {
-    isProcessing.value = false;
-    Toast.fire({
-      icon: "error",
-      title: "無法對餐廳取消讚，請稍後再試",
+      title: toastTitle,
     });
     console.log("error", error);
   }

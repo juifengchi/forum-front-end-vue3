@@ -57,20 +57,17 @@ onBeforeRouteUpdate((to, from, next) => {
 async function fetchRestaurants({ queryPage, queryCategoryId }) {
   try {
     isLoading.value = true;
-    const response = await restaurantsAPI.getRestaurants({
+    const { data } = await restaurantsAPI.getRestaurants({
       page: queryPage,
       categoryId: queryCategoryId,
     });
-    // const { restaurants, categories, categoryId, page, totalPage, prev, next } =
-    //   response.data;
-    // console.log(response.data);
-    restaurants.value = response.data.restaurants;
-    categories.value = response.data.categories;
-    categoryId.value = response.data.categoryId;
-    currentPage.value = response.data.page;
-    totalPage.value = response.data.totalPage;
-    previousPage.value = response.data.prev;
-    nextPage.value = response.data.next;
+    restaurants.value = data.restaurants;
+    categories.value = data.categories;
+    categoryId.value = data.categoryId;
+    currentPage.value = data.page;
+    totalPage.value = data.totalPage;
+    previousPage.value = data.prev;
+    nextPage.value = data.next;
     isLoading.value = false;
   } catch (error) {
     isLoading.value = false;
