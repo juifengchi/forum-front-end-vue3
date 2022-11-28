@@ -40,7 +40,7 @@ function handleSubmit() {
   emit("after-create-comment", {
     restaurantId: props.restaurantId,
     text: text.value,
-    emit: "create",
+    action: "create",
   });
   text.value = "";
 }

@@ -102,7 +102,7 @@ async function afterHandleComment(payload) {
       throw new Error(data.message);
     }
     if (payload.action === "delete") {
-      restaurant.value.comments = restaurant.value.comments.value.filter(
+      restaurant.value.comments = restaurant.value.comments.filter(
         (comment) => comment.id !== payload.commentId
       );
     } else {
