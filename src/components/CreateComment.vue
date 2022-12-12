@@ -29,7 +29,7 @@ const emit = defineEmits(["after-create-comment"]);
 
 const text = ref("");
 
-function handleSubmit() {
+const handleSubmit = () => {
   if (!text.value) {
     Toast.fire({
       icon: "warning",
@@ -43,7 +43,7 @@ function handleSubmit() {
     action: "create",
   });
   text.value = "";
-}
+};
 </script>
 
 <style scoped>

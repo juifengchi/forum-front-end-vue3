@@ -44,12 +44,12 @@ const emit = defineEmits(["after-delete-comment"]);
 const userStore = useUserStore();
 const currentUser = computed(() => userStore.currentUser);
 
-function handleDeleteButtonClick(commentId) {
+const handleDeleteButtonClick = (commentId) => {
   emit("after-delete-comment", {
     commentId,
     action: "delete",
   });
-}
+};
 </script>
 
 <style scoped>

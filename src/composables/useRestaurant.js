@@ -1,14 +1,17 @@
 import usersAPI from "./../apis/users";
 import { Toast } from "./../utils/helpers";
 import { ref } from "vue";
-
-export function useRestaurant(initialState) {
+// module export & import
+// arrow function
+export const useRestaurant = (initialState) => {
+  // let & const to replace var
   const restaurant = ref(initialState);
   const isProcessing = ref(false);
 
   async function toggleFavorite(restaurantId) {
     try {
       isProcessing.value = true;
+      // destructuring assignment
       const { data } = !restaurant.value.isFavorited
         ? await usersAPI.addFavorite({ restaurantId })
         : await usersAPI.deleteFavorite({ restaurantId });
@@ -16,6 +19,7 @@ export function useRestaurant(initialState) {
         throw new Error(data.message);
       }
       restaurant.value = {
+        // spread operator
         ...restaurant.value,
         isFavorited: !restaurant.value.isFavorited,
       };
@@ -29,7 +33,8 @@ export function useRestaurant(initialState) {
         icon: "error",
         title: toastTitle,
       });
-      console.log("error", error);
+      // template literals
+      console.log(`Error: ${error}`);
     }
   }
 
@@ -46,9 +51,7 @@ export function useRestaurant(initialState) {
         ...restaurant.value,
         isLiked: !restaurant.value.isLiked,
       };
-      isProcessing.value = false;
     } catch (error) {
-      isProcessing.value = false;
       const toastTitle = !restaurant.value.isLiked
         ? "無法對餐廳按讚，請稍後再試"
         : "無法對餐廳取消讚，請稍後再試";
@@ -56,9 +59,11 @@ export function useRestaurant(initialState) {
         icon: "error",
         title: toastTitle,
       });
-      console.log("error", error);
+      console.log(`Error: ${error}`);
+    } finally {
+      isProcessing.value = false;
     }
   }
 
   return { restaurant, isProcessing, toggleFavorite, toggleLike };
-}
+};

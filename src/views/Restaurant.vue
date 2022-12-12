@@ -69,6 +69,7 @@ async function fetchRestaurant(restaurantId) {
       opening_hours,
       Comments,
     } = data.restaurant;
+    // object literal property value shorthand
     restaurant.value = {
       id,
       name,
@@ -95,17 +96,13 @@ async function fetchRestaurant(restaurantId) {
 async function afterHandleComment(payload) {
   try {
     const { data } =
-      payload.action === "delete"
-        ? await commentsAPI.deleteComment({ commentId: payload.commentId })
-        : await commentsAPI.createComment(payload);
+      payload.action === "create"
+        ? await commentsAPI.createComment(payload)
+        : await commentsAPI.deleteComment({ commentId: payload.commentId });
     if (data.status !== "success") {
       throw new Error(data.message);
     }
-    if (payload.action === "delete") {
-      restaurant.value.comments = restaurant.value.comments.filter(
-        (comment) => comment.id !== payload.commentId
-      );
-    } else {
+    if (payload.action === "create") {
       restaurant.value.comments.push({
         id: data.commentId,
         RestaurantId: data.restaurantId,
@@ -116,12 +113,16 @@ async function afterHandleComment(payload) {
         text: payload.text,
         createdAt: new Date(),
       });
+    } else {
+      restaurant.value.comments = restaurant.value.comments.filter(
+        (comment) => comment.id !== payload.commentId
+      );
     }
   } catch (error) {
     const toastTitle =
-      payload.action === "delete"
-        ? "無法移除評論，請稍後再試"
-        : "無法新增評論，請稍後再試";
+      payload.action === "create"
+        ? "無法新增評論，請稍後再試"
+        : "無法移除評論，請稍後再試";
     Toast.fire({
       icon: "error",
       title: toastTitle,

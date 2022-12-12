@@ -19,7 +19,7 @@
           </RouterLink>
         </p>
         <span class="badge badge-secondary">{{
-          restaurant.Category.name
+          restaurant.Category?.name
         }}</span>
         <p class="card-text text-truncate">
           {{ restaurant.description }}
@@ -84,9 +84,9 @@ const { restaurant, isProcessing, toggleFavorite, toggleLike } = useRestaurant(
 );
 
 const isLoading = ref(true);
-function changeLoading() {
+const changeLoading = () => {
   isLoading.value = false;
-}
+};
 </script>
 
 <style scoped>
